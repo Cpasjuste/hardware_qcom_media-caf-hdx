@@ -8,8 +8,8 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := \
     $(TOP)/frameworks/av/include/media/stagefright \
     $(TOP)/frameworks/native/include/media/openmax \
-    $(TOP)/hardware/qcom/display/libcopybit \
-    $(TARGET_OUT_HEADERS)/qcom/display/
+    $(TOP)/hardware/qcom/display-caf-hdx/libcopybit \
+    $(TARGET_OUT_HEADERS)/qcom/display-caf-hdx/
 
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
 
