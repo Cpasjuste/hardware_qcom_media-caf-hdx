@@ -63,7 +63,6 @@ struct DashPlayerDriver : public MediaPlayerInterface {
     virtual status_t dump(int fd, const Vector<String16> &args) const;
 
     void notifyResetComplete();
-    void notifySetSurfaceComplete();
     void notifyDuration(int64_t durationUs);
     void notifyPosition(int64_t positionUs);
     void notifySeekComplete();
@@ -80,7 +79,6 @@ private:
     // The following are protected through "mLock"
     // >>>
     bool mResetInProgress;
-    bool mSetSurfaceInProgress;
     int64_t mDurationUs;
     int64_t mPositionUs;
     int64_t mNumFramesTotal;

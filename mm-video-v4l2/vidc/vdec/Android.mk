@@ -109,7 +109,7 @@ libmm-vdec-inc      += hardware/qcom/media-caf-hdx/libc2dcolorconvert
 libmm-vdec-inc      += hardware/qcom/display-caf-hdx/libcopybit
 libmm-vdec-inc      += frameworks/av/include/media/stagefright
 libmm-vdec-inc      += $(TARGET_OUT_HEADERS)/mm-video/SwVdec
-libmm-vdec-inc      += $(TARGET_OUT_HEADERS)/qcom/display/
+libmm-vdec-inc      += $(TARGET_OUT_HEADERS)/qcom/display-caf-hdx/
 
 ifneq ($(call is-platform-sdk-version-at-least, 19),true)
 libOmxVdec-def += -DMETADATA_FOR_DYNAMIC_MODE

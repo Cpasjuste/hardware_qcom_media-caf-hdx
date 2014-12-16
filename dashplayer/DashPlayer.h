@@ -100,10 +100,6 @@ private:
     struct Decoder;
     struct Renderer;
     struct Source;
-    struct Action;
-    struct SimpleAction;
-    struct SetSurfaceAction;
-    struct ShutdownDecoderAction;
 
     enum {
           // These keys must be in sync with the keys in QCTimedText.java
@@ -163,6 +159,7 @@ private:
     enum {
         kWhatBufferingStart             = 'bfst',
         kWhatBufferingEnd               = 'bfen',
+        kWhatSourceResumeStatus         = 'srsm',
     };
 
     wp<DashPlayerDriver> mDriver;
@@ -177,13 +174,10 @@ private:
     sp<Decoder> mTextDecoder;
     sp<Renderer> mRenderer;
 
-    List<sp<Action> > mDeferredActions;
-
     bool mAudioEOS;
     bool mVideoEOS;
 
     bool mScanSourcesPending;
-    bool isSetSurfaceTexturePending;
     int32_t mScanSourcesGeneration;
     bool mBufferingNotification;
 
@@ -278,15 +272,6 @@ private:
     void sendTextPacket(sp<ABuffer> accessUnit, status_t err);
     void getTrackName(int track, char* name);
     void prepareSource();
-
-    void processDeferredActions();
-
-    //void performSeek(int64_t seekTimeUs);
-    //void performDecoderFlush();
-    void performDecoderShutdown(bool audio, bool video);
-    //void performReset();
-    void performScanSources();
-    void performSetSurface(const sp<NativeWindowWrapper> &wrapper);
 
     struct QueueEntry {
         sp<AMessage>  mMessageToBeConsumed;

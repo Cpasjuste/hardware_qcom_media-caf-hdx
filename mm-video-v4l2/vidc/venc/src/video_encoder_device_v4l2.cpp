@@ -568,8 +568,6 @@ bool venc_dev::venc_open(OMX_U32 codec)
         m_sVenc_cfg.codectype = V4L2_PIX_FMT_MPEG4;
         codec_profile.profile = V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE;
         profile_level.level = V4L2_MPEG_VIDEO_MPEG4_LEVEL_2;
-        session_qp_range.minqp = 1;
-        session_qp_range.maxqp = 31;
 #ifdef OUTPUT_BUFFER_LOG
         strcat(outputfilename, "m4v");
 #endif
@@ -577,8 +575,6 @@ bool venc_dev::venc_open(OMX_U32 codec)
         m_sVenc_cfg.codectype = V4L2_PIX_FMT_H263;
         codec_profile.profile = VEN_PROFILE_H263_BASELINE;
         profile_level.level = VEN_LEVEL_H263_20;
-        session_qp_range.minqp = 1;
-        session_qp_range.maxqp = 31;
 #ifdef OUTPUT_BUFFER_LOG
         strcat(outputfilename, "263");
 #endif
@@ -586,8 +582,6 @@ bool venc_dev::venc_open(OMX_U32 codec)
         m_sVenc_cfg.codectype = V4L2_PIX_FMT_H264;
         codec_profile.profile = V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE;
         profile_level.level = V4L2_MPEG_VIDEO_H264_LEVEL_1_0;
-        session_qp_range.minqp = 1;
-        session_qp_range.maxqp = 51;
 #ifdef OUTPUT_BUFFER_LOG
         strcat(outputfilename, "264");
 #endif
@@ -595,8 +589,6 @@ bool venc_dev::venc_open(OMX_U32 codec)
         m_sVenc_cfg.codectype = V4L2_PIX_FMT_VP8;
         codec_profile.profile = V4L2_MPEG_VIDC_VIDEO_VP8_UNUSED;
         profile_level.level = V4L2_MPEG_VIDC_VIDEO_VP8_VERSION_0;
-        session_qp_range.minqp = 1;
-        session_qp_range.maxqp = 128;
 #ifdef OUTPUT_BUFFER_LOG
         strcat(outputfilename, "ivf");
 #endif
@@ -740,13 +732,6 @@ bool venc_dev::venc_open(OMX_U32 codec)
         capability.max_width = frmsize.stepwise.max_width;
         capability.min_height = frmsize.stepwise.min_height;
         capability.max_height = frmsize.stepwise.max_height;
-    }
-    //Initialize non-default parameters
-    if (m_sVenc_cfg.codectype == V4L2_PIX_FMT_VP8) {
-        control.id = V4L2_CID_MPEG_VIDC_VIDEO_NUM_P_FRAMES;
-        control.value = 0x7fffffff;
-        if (ioctl(m_nDriver_fd, VIDIOC_S_CTRL, &control))
-            DEBUG_PRINT_ERROR("Failed to set V4L2_CID_MPEG_VIDC_VIDEO_NUM_P_FRAMES");
     }
 
     return true;
@@ -1319,25 +1304,6 @@ bool venc_dev::venc_set_param(void *paramData,OMX_INDEXTYPE index )
 
                 break;
             }
-        case OMX_QcomIndexParamVideoQPRange:
-            {
-                DEBUG_PRINT_LOW("venc_set_param:OMX_QcomIndexParamVideoQPRange\n");
-                OMX_QCOM_VIDEO_PARAM_QPRANGETYPE *session_qp_range =
-                    (OMX_QCOM_VIDEO_PARAM_QPRANGETYPE *)paramData;
-
-                if(session_qp_range->nPortIndex == (OMX_U32)PORT_INDEX_OUT) {
-                    if(venc_set_session_qp_range (session_qp_range->minQP,
-                                session_qp_range->maxQP) == false) {
-                        DEBUG_PRINT_ERROR("\nERROR: Setting QP Range[%d %d] failed",
-                            session_qp_range->minQP, session_qp_range->maxQP);
-                        return false;
-                    }
-                } else {
-                    DEBUG_PRINT_ERROR("\nERROR: Invalid Port Index for OMX_QcomIndexParamVideoQPRange");
-                }
-
-                break;
-            }
         case OMX_QcomIndexEnableSliceDeliveryMode:
             {
                 QOMX_EXTNINDEX_PARAMTYPE* pParam =
@@ -1713,9 +1679,6 @@ void venc_dev::venc_config_print()
 
     DEBUG_PRINT_HIGH("ENC_CONFIG: qpI: %ld, qpP: %ld, qpb: %ld",
             session_qp.iframeqp, session_qp.pframqp,session_qp.bframqp);
-
-    DEBUG_PRINT_HIGH("\nENC_CONFIG: minQP: %d, maxQP: %d",
-            session_qp_range.minqp, session_qp_range.maxqp);
 
     DEBUG_PRINT_HIGH("ENC_CONFIG: VOP_Resolution: %ld, Slice-Mode: %ld, Slize_Size: %ld",
             voptimecfg.voptime_resolution, multislice.mslice_mode,
@@ -2278,48 +2241,6 @@ bool venc_dev::venc_set_session_qp(OMX_U32 i_frame_qp, OMX_U32 p_frame_qp,OMX_U3
         DEBUG_PRINT_LOW("Success IOCTL set control for id=%d, value=%d", control.id, control.value);
 
         session_qp.bframqp = control.value;
-    }
-
-    return true;
-}
-
-bool venc_dev::venc_set_session_qp_range(OMX_U32 min_qp, OMX_U32 max_qp)
-{
-    int rc;
-    struct v4l2_control control;
-
-    if ((min_qp >= session_qp_range.minqp) && (max_qp <= session_qp_range.maxqp)) {
-
-        if (m_sVenc_cfg.codectype == V4L2_PIX_FMT_VP8)
-            control.id = V4L2_CID_MPEG_VIDC_VIDEO_VP8_MIN_QP;
-        else
-            control.id = V4L2_CID_MPEG_VIDEO_H264_MIN_QP;
-        control.value = min_qp;
-
-        DEBUG_PRINT_LOW("Calling IOCTL set MIN_QP control id=%d, val=%d",
-                control.id, control.value);
-        rc = ioctl(m_nDriver_fd, VIDIOC_S_CTRL, &control);
-        if (rc) {
-            DEBUG_PRINT_ERROR("Failed to set control\n");
-            return false;
-        }
-
-        if (m_sVenc_cfg.codectype == V4L2_PIX_FMT_VP8)
-            control.id = V4L2_CID_MPEG_VIDC_VIDEO_VP8_MAX_QP;
-        else
-            control.id = V4L2_CID_MPEG_VIDEO_H264_MAX_QP;
-        control.value = max_qp;
-
-        DEBUG_PRINT_LOW("Calling IOCTL set MAX_QP control id=%d, val=%d",
-                control.id, control.value);
-        rc = ioctl(m_nDriver_fd, VIDIOC_S_CTRL, &control);
-        if (rc) {
-            DEBUG_PRINT_ERROR("Failed to set control\n");
-            return false;
-        }
-    } else {
-        DEBUG_PRINT_ERROR("Wrong qp values[%d %d], allowed range[%d %d]",
-            min_qp, max_qp, session_qp_range.minqp, session_qp_range.maxqp);
     }
 
     return true;

@@ -34,23 +34,20 @@
 namespace android {
 
 enum {
-	kKeyMinBlkSize        = 'mibs', //int32_t
-	kKeyMaxBlkSize        = 'mabs', //int32_t
-	kKeyMinFrmSize        = 'mifs', //int32_t
-	kKeyMaxFrmSize        = 'mafs', //int32_t
     kKeyAacCodecSpecificData = 'nacc' , // for native aac files
-
-//    kKeyRawCodecSpecificData = 'rcsd',  // raw data - added to support mmParser
-//    kKeyDivXVersion          = 'DivX',  // int32_t
-//    kKeyDivXDrm              = 'QDrm',  // void *
-//    kKeyWMAEncodeOpt         = 'eopt',  // int32_t
-//    kKeyWMABlockAlign        = 'blka',  // int32_t
-//    kKeyWMAVersion           = 'wmav',  // int32_t
-//    kKeyWMAAdvEncOpt1        = 'ade1',  // int16_t
-//    kKeyWMAAdvEncOpt2        = 'ade2',  // int32_t
-//    kKeyWMAFormatTag         = 'fmtt',  // int64_t
-//    kKeyWMABitspersample     = 'bsps',  // int64_t
-//    kKeyWMAVirPktSize        = 'vpks',  // int64_t
+/*
+    kKeyRawCodecSpecificData = 'rcsd',  // raw data - added to support mmParser
+    kKeyDivXVersion          = 'DivX',  // int32_t
+    kKeyDivXDrm              = 'QDrm',  // void *
+    kKeyWMAEncodeOpt         = 'eopt',  // int32_t
+    kKeyWMABlockAlign        = 'blka',  // int32_t
+    kKeyWMAVersion           = 'wmav',  // int32_t
+    kKeyWMAAdvEncOpt1        = 'ade1',  // int16_t
+    kKeyWMAAdvEncOpt2        = 'ade2',  // int32_t
+    kKeyWMAFormatTag         = 'fmtt',  // int64_t
+    kKeyWMABitspersample     = 'bsps',  // int64_t
+    kKeyWMAVirPktSize        = 'vpks',  // int64_t
+*/
     kKeyWMAChannelMask       = 'chmk',  // int32_t
 
     kKeyFileFormat           = 'ffmt',  // cstring
@@ -68,8 +65,12 @@ enum {
     kKeySmoothStreaming      = 'ESmS',  //bool (int32_t)
     kKeyHFR                  = 'hfr ',  // int32_t
     kKeyHSR                  = 'hsr ',  // int32_t
-};
 
+	kKeyMinBlkSize		= 'mibs', //int32_t
+	kKeyMaxBlkSize		= 'mabs', //int32_t
+	kKeyMinFrmSize		= 'mifs', //int32_t
+	kKeyMaxFrmSize		= 'mafs', //int32_t
+};
 /*
 enum {
     kTypeDivXVer_3_11,
@@ -77,14 +78,12 @@ enum {
     kTypeDivXVer_5,
     kTypeDivXVer_6,
 };
-
 enum {
     kTypeWMA,
     kTypeWMAPro,
     kTypeWMALossLess,
 };
 */
-
 //This enum should be keep in sync with "enum Flags" in MediaExtractor.h in AOSP,
 //Value should reflect as last entry in the enum
 enum {

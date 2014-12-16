@@ -29,7 +29,6 @@ namespace android {
 
 DashPlayerDriver::DashPlayerDriver()
     : mResetInProgress(false),
-      mSetSurfaceInProgress(false),
       mDurationUs(-1),
       mPositionUs(-1),
       mNumFramesTotal(0),
@@ -99,21 +98,7 @@ status_t DashPlayerDriver::setDataSource(const sp<IStreamSource> &source) {
 
 status_t DashPlayerDriver::setVideoSurfaceTexture(
         const sp<IGraphicBufferProducer> &bufferProducer) {
-    Mutex::Autolock autoLock(mLock);
-
-    if (mResetInProgress) {
-      return INVALID_OPERATION;
-    }
-
-    ALOGE("DashPlayerDriver::setVideoSurfaceTexture call and block");
-
-    mSetSurfaceInProgress = true;
-
-    mPlayer->setVideoSurfaceTexture(bufferProducer);
-
-    while (mSetSurfaceInProgress) {
-       mCondition.wait(mLock);
-    }
+  mPlayer->setVideoSurfaceTexture(bufferProducer);
 
   return OK;
 }
@@ -416,14 +401,6 @@ void DashPlayerDriver::notifyResetComplete() {
     Mutex::Autolock autoLock(mLock);
     CHECK(mResetInProgress);
     mResetInProgress = false;
-    mCondition.broadcast();
-}
-
-void DashPlayerDriver::notifySetSurfaceComplete() {
-    Mutex::Autolock autoLock(mLock);
-    CHECK(mSetSurfaceInProgress);
-    mSetSurfaceInProgress = false;
-    ALOGV("DashPlayerDriver::notifySetSurfaceComplete done");
     mCondition.broadcast();
 }
 
