@@ -9268,9 +9268,11 @@ OMX_ERRORTYPE omx_vdec::allocate_color_convert_buf::allocate_buffers_color_conve
         omx->free_ion_memory(&op_buf_ion_info[i]);
         return OMX_ErrorInsufficientResources;
     }
+#ifndef AMZ_HDX
     m_heap_ptr[i].video_heap_ptr = new VideoHeap (
             op_buf_ion_info[i].ion_device_fd,buffer_size_req,
             pmem_baseaddress[i],op_buf_ion_info[i].ion_alloc_data.handle,pmem_fd[i]);
+#endif
 #endif
     m_pmem_info_client[i].pmem_fd = (OMX_U32)m_heap_ptr[i].video_heap_ptr.get();
     m_pmem_info_client[i].offset = 0;
